@@ -1,0 +1,27 @@
+{
+  "name": "string-parse",
+  "version": "0.1.0",
+  "description": "Javascript library for parsing strings",
+  "main": "lib/string-parse.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeldCE/string-parse.git"
+  },
+  "keywords": [
+    "string",
+    "parse"
+  ],
+  "author": "MeldCE Opensource",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MeldCE/string-parse/issues"
+  },
+  "homepage": "https://github.com/MeldCE/string-parse#readme",
+  "dependencies": {
+    "color-console": "0.0.1",
+    "skemer": "^0.8.6-r1"
+  }
+}
