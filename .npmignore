@@ -1,0 +1,6 @@
+*~
+.*.sw?
+spec
+src
+gulpfile.js
+example.js
