@@ -19,6 +19,13 @@
   "bugs": {
     "url": "https://github.com/MeldCE/string-parse/issues"
   },
+  "contributors": [
+    {
+      "name": "Jack Farley",
+      "url": "http://www.thesolderingbench.com",
+      "email": "npm@thesolderingbench.com"
+    }
+  ],
   "homepage": "https://github.com/MeldCE/string-parse#readme",
   "dependencies": {
     "color-console": "0.0.1",
@@ -43,5 +50,6 @@
     "gulp-strip-debug": "^1.1.0",
     "jasmine": "^2.4.1",
     "jasmine2-reporter": "^0.1.2"
-  }
+  },
+  "tonicExampleFilename": "example.js"
 }
