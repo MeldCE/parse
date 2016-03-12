@@ -15,46 +15,6 @@ characters, splitting the string on certain characters and handling blocks
 ```javascript
 var stringParse = require('./src/lib/string-parse.js');
 
-/*var parseOptions = {
-  blocks: {
-    stopTag: {
-      start: '</',
-      stop: '>',
-      split: ' ',
-      ignoreEmpty: true
-    },
-    startTag: {
-      start: '<',
-      stop: '>',
-      split: ' ',
-      ignoreEmpty: true,
-      blocks: {
-        expression: { '@ref': '/blocks/expression' },
-        quotes: {
-          start: '\'',
-          end: '\'',
-          escapedStop: '\\\''
-        },
-        doubleQuotes: {
-          start: '"',
-          end: '"',
-          escapedStop: '\\"'
-        }
-      }
-    },
-    expression: {
-      start: '{{',
-      escapedStart: '{{{',
-      stop: '}}',
-      escapedStop: '}}}',
-      removeStarStop: true,
-      handle: function(block) { console.log(block); return block; },
-      reparse: true
-    }
-  },
-  debug: true
-};*/
-
 var parseOptions = {
   blocks: {
     stopTag: {
