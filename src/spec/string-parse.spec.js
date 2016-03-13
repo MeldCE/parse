@@ -16,6 +16,30 @@ describe('string splitting', function() {
       split: /^[ =]/,
     })).toEqual(['this', 'string', 'string']);
   });
+  
+  it('should split a string with split option as regex and store the split',
+      function() {
+    expect(stringParse('this string=string', {
+      split: /^[ =]/,
+      storeSplit: true
+    })).toEqual(['this', ' ', 'string', '=', 'string']);
+  });
+  
+  it('should split a string with split option as regex and store only the '
+      + 'the match group specified if it is a number', function() {
+    expect(stringParse('this,string  =   string', {
+      split: /^ *([,=]) */,
+      storeSplit: 1
+    })).toEqual(['this', ',', 'string', '=', 'string']);
+  });
+  
+  it('should split a string with split option as regex and store the '
+      + 'entire match given an invalid group match number', function() {
+    expect(stringParse('this, string  =   string', {
+      split: /^ *([,=]) */,
+      storeSplit: 5
+    })).toEqual(['this', ', ', 'string', '  =   ', 'string']);
+  });
 });
 
 describe('character stripping', function() {
@@ -46,6 +70,20 @@ describe('handle functions', function() {
       },
       handle: function(block) { return block + '!'; }
     })).toEqual(['val1!', 'val2!', 'val2a', 'val3!']);
+  });
+
+  it('should call the handle on all parts with handleAll', function() {
+    expect(stringParse('val1,val2<val2a>,val3', {
+      split: ',',
+      blocks: {
+        block: {
+          start: '<',
+          stop: '>'
+        }
+      },
+      handle: function(block) { return block + '!'; },
+      handleAll: true
+    })).toEqual(['val1!', 'val2!', 'val2a!', 'val3!']);
   });
 });
 

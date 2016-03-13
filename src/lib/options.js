@@ -17,8 +17,18 @@ module.exports = {
     storeSplit: {
       description: 'Whether or not to store the split character. If true, '
           + 'the split character will be it\'s own element in the returned '
-          + 'array.',
-      type: 'boolean'
+          + 'array. If a number (n) is given and `split` is a regular '
+          + 'expression, the nth matching group will be stored instead of the '
+          + 'entire matching string',
+      types: {
+        bool: {
+          type: 'boolean'
+        },
+        index: {
+          type: 'number',
+          min: 0
+        }
+      }
     },
     stripChars: {
       description: 'Characters or regular expression expressions to strip '
