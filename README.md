@@ -28,6 +28,7 @@ Parses the given string using the given options
                as the first parameter
     -   `options.handleAll` **[boolean]** Whether or not to call the handle
                function for blocks as well as non-blocks
+    -   `options.context` **[Any]** Context to give to handle functions
     -   `options.debug` **[boolean or number]** If true, the string and any
                special characters (block characters, split characters etc) will be
                printed to `stdout`while parsing the string
@@ -50,9 +51,9 @@ Parses the given string using the given options
         -   `options.blocks.escapedStop` **[string]** Characters that are used to
                    represent an escaped version of the end block characters within a
                    block
-        -   `options.blocks.replaceEscapes` **[boolean]** Whether or not to replace
-                   the escaped block characters with the actual block characters (eg \"
-                   to ") in the returned string
+        -   `options.blocks.keepStartStop` **[boolean]** Whether or not to the start
+                   and stop characters. The start and stop characters will be separate
+                   elements in the returned parts array
         -   `options.blocks.split` **[]** Characters or regular expression to split
                    the block on
         -   `options.blocks.storeSplit` **[undefined]** 
@@ -67,9 +68,9 @@ Parses the given string using the given options
                    return the parsed value back.
         -   `options.blocks.reparse` **[boolean]** Whether or not to reparse the
                    returned value from the handle function.
-        -   `options.blocks.keepStartStop` **[boolean]** Whether or not to the start
-                   and stop characters. The start and stop characters will be separate
-                   elements in the returned parts array
+        -   `options.blocks.replaceEscapes` **[boolean]** Whether or not to replace
+                   the escaped block characters with the actual block characters (eg \"
+                   to ") in the returned string
 
 Returns **string or Array&lt;string&gt;** Returns a parsed string (if there is only one
          part to the string or and array of parsed string parts

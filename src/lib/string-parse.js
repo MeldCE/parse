@@ -120,7 +120,11 @@ module.exports = function stringParse(string, options) {
 
       if (current.block.handle) {
         // TODO handle replacement parsing
-        output = current.block.handle(current.parts);
+        if (options.context) {
+          output = current.block.handle.call(options.context, current.parts);
+        } else {
+          output = current.block.handle(current.parts);
+        }
         
         if (current.block.reparse && typeof output === 'string') {
           // Store current string
@@ -147,7 +151,11 @@ module.exports = function stringParse(string, options) {
 
       if (output) {
         if (!stack.length && current.block.handle && current.block.handleAll) {
-          output = current.block.handle(output);
+          if (options.context) {
+            output = current.block.handle.call(options.context, output);
+          } else {
+            output = current.block.handle(output);
+          }
         }
         current.parts.push(output);
       }
@@ -187,7 +195,11 @@ module.exports = function stringParse(string, options) {
             // Run handle function if in root
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
-              part = current.block.handle(part);
+              if (options.context) {
+                part = current.block.handle.call(options.context, part);
+              } else {
+                part = current.block.handle(part);
+              }
             }
             current.parts.push(part);
             current.part = [];
@@ -224,7 +236,11 @@ module.exports = function stringParse(string, options) {
             // Run handle function if in root
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
-              part = current.block.handle(part);
+              if (options.context) {
+                part = current.block.handle.call(options.context, part);
+              } else {
+                part = current.block.handle(part);
+              }
             }
             current.parts.push(part);
             current.part = [];
@@ -328,7 +344,11 @@ module.exports = function stringParse(string, options) {
     // Run handle function if in root
     let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
     if (!stack.length && current.block.handle) {
-      part = current.block.handle(part);
+      if (options.context) {
+        part = current.block.handle.call(options.context, part);
+      } else {
+        part = current.block.handle(part);
+      }
     }
     current.parts.push(part);
   }

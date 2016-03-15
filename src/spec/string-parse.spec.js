@@ -85,6 +85,25 @@ describe('handle functions', function() {
       handleAll: true
     })).toEqual(['val1!', 'val2!', 'val2a!', 'val3!']);
   });
+
+  it('should call the handle in context if given', function() {
+    var context = {
+      bits: []
+    };
+    stringParse('val1,val2<val2a>,val3', {
+      split: ',',
+      blocks: {
+        block: {
+          start: '<',
+          stop: '>'
+        }
+      },
+      handle: function(block) { this.bits.push(block + '!'); return block; },
+      handleAll: true,
+      context: context
+    });
+    expect(context.bits).toEqual(['val1!', 'val2!', 'val2a!', 'val3!']);
+  });
 });
 
 describe('blocks', function() {

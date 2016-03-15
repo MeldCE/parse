@@ -119,6 +119,10 @@ module.exports = {
           + 'well as non-blocks',
       type: 'boolean'
     },
+    context: {
+      description: 'Context to give to handle functions',
+      type: 'any'
+    },
     debug: {
       description: 'If true, the string and any special characters (block '
           + 'characters, split characters etc) will be printed to `stdout`'
