@@ -21,7 +21,10 @@ module.exports = function stringParse(string, options) {
 
   var b, last = 0, i = 0;
   
-  //options = skemer.validateNew({ schema: stringParseOptions }, options);
+  options = skemer.validateNew({
+    schema: stringParseOptions,
+    allowReferences: true
+  }, options);
 
   // Rewrite regexps so that they have ^
   if (options.split instanceof RegExp) {
@@ -138,7 +141,7 @@ module.exports = function stringParse(string, options) {
 
       // Pop the outer block off the stack
       current = stack.pop();
-      if (options.debug) iD('%%block is now ' + (current.name || 'root') + '%%');
+      if (options.debug === 1) iD('%%block is now ' + (current.name || 'root') + '%%');
       
       current.start = i;
 

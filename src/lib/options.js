@@ -30,7 +30,7 @@ module.exports = {
         }
       }
     },
-    stripChars: {
+    strip: {
       description: 'Characters or regular expression expressions to strip '
           + 'from outside of blocks',
       types: {

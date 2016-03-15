@@ -9,6 +9,9 @@ characters, splitting the string on certain characters and handling blocks
 <!-- START doctoc -->
 <!-- END doctoc -->
 
+# Module
+<!--=include ../build/string-parse.js.md -->
+
 # Example
 [Try on Tonic](https://tonicdev.com/npm/string-parse)
 

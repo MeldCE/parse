@@ -2,5 +2,6 @@
 .*.sw?
 spec
 src
+build
 gulpfile.js
 example.js

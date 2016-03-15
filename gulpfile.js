@@ -25,7 +25,7 @@ var paths = {
   reports: 'reports/',
   docs: 'docs/',
   src: 'src/lib/**/*.js',
-  docsSrc: 'build/docsSrc',
+  docsSrc: 'lib/string-parse.js',
   exampleSrc: 'src/example.js',
   testDir: 'src/spec',
   testSrc: 'src/*.spec.js',
@@ -153,7 +153,7 @@ gulp.task('compile', ['lint'], function() {
     stringParseOptions: {
       schema: options,
       options: {
-        preLine: '   * ',
+        preLine: '  * ',
         name: 'options',
         wrap: 80,
         type: 'param'
@@ -184,13 +184,13 @@ gulp.task('compile', ['lint'], function() {
 gulp.task('docs', ['compile', 'htmldocs', 'mddocs']);
 
 gulp.task('htmldocs', ['lint', 'compile'], function() {
-  return gulp.src(path.join(paths.docsSrc, '**/*.js'))
+  return gulp.src(paths.docsSrc)
       .pipe(documentation({ format: 'html' }))
       .pipe(gulp.dest(paths.docs));
 });
 
 gulp.task('mddocs', ['lint', 'compile'], function() {
-  return gulp.src(path.join(paths.docsSrc, '**/*.js'))
+  return gulp.src(paths.docsSrc)
       .pipe(foreach(function(stream, file) {
         return stream
             .pipe(documentation({ format: 'md', shallow: true }))
