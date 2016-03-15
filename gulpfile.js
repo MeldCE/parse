@@ -194,7 +194,7 @@ gulp.task('mddocs', ['lint', 'compile'], function() {
       .pipe(foreach(function(stream, file) {
         return stream
             .pipe(documentation({ format: 'md', shallow: true }))
-            .pipe(replace(/^#/gm, '##'))
+            //.pipe(replace(/^#/gm, '##'))
             .pipe(concat(file.relative + '.md'));
             //.pipe(rename({
             //  basename: file.name,

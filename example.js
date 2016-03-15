@@ -1,4 +1,4 @@
-var stringParse = require('./lib/string-parse.js');
+var stringParse = require('string-parse');
 
 var parseOptions = {
   blocks: {
