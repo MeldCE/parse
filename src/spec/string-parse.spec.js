@@ -58,6 +58,50 @@ describe('character stripping', function() {
   });
 });
 
+describe('blocks', function() {
+  it('should handle blocks', function() {
+    expect(stringParse('val1,val2<val2a>,val3', {
+      split: ',',
+      blocks: {
+        block: {
+          start: '<',
+          stop: '>'
+        }
+      }
+    })).toEqual(['val1', 'val2', 'val2a', 'val3']);
+  });
+
+  it('should handle escaped block characters', function() {
+    expect(stringParse('val<<1,val2<val>>2a>,val3', {
+      split: ',',
+      blocks: {
+        block: {
+          start: '<',
+          escapedStart: '<<',
+          stop: '>',
+          escapedStop: '>>'
+        }
+      }
+    })).toEqual(['val<<1', 'val2', 'val>>2a', 'val3']);
+  });
+
+  it('should handle escaped block characters with block characters if '
+      + 'told to do so', function() {
+    expect(stringParse('val<<1,val2<val>>2a>,val3', {
+      split: ',',
+      blocks: {
+        block: {
+          start: '<',
+          escapedStart: '<<',
+          stop: '>',
+          escapedStop: '>>',
+          replaceEscapes: true
+        }
+      }
+    })).toEqual(['val<1', 'val2', 'val>2a', 'val3']);
+  });
+});
+
 describe('handle functions', function() {
   it('should call the handle on non-block parts if no handleAll', function() {
     expect(stringParse('val1,val2<val2a>,val3', {

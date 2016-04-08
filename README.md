@@ -33,14 +33,16 @@ Parses the given string using the given options
                special characters (block characters, split characters etc) will be
                printed to `stdout`while parsing the string
     -   `options.split` **[string or RegExp]** Characters or regular expression to
-               split string on
+               split string on.Regular expressions must match from the start of the
+               string, eg /^( |=)/
     -   `options.storeSplit` **[boolean or number]** Whether or not to store the
                split character. If true, the split character will be it's own
                element in the returned array. If a number (n) is given and `split`
                is a regular expression, the nth matching group will be stored
                instead of the entire matching string
     -   `options.strip` **[string or RegExp]** Characters or regular expression
-               expressions to strip from outside of blocks
+               expressions to strip from outside of blocks. Regular expressions must
+               match from the start of the string, eg /^( |=)/
     -   `options.blocks` **[Array&lt;Object&gt;]** An object containing blocks (like quoted
                blocks) to not split in
         -   `options.blocks.start` **[string]** Characters that start the block

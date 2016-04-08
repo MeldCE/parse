@@ -21,28 +21,48 @@ module.exports = function stringParse(string, options) {
 
   var b, last = 0, i = 0;
   
+  // Validate, but don't dereference so can nicely do checks first
   options = skemer.validateNew({
     schema: stringParseOptions,
-    allowReferences: true
+    allowReferences: true,
+    noDereference: true
   }, options);
 
-  // Rewrite regexps so that they have ^
-  if (options.split instanceof RegExp) {
-    if (!options.split.toString().startsWith('/^')) {
-      options.split = new RegExp(options.split.toString().replace(/^\/(.*)\/$/, '^$1'));
-    }
-  }
 
-  if (options.stripChars) {
-    let s;
-    for (s in options.stripChars) {
-      if (options.stripChars instanceof RegExp) {
-        if (!options.stripChars.toString().startsWith('/^')) {
-          options.stripChars = new RegExp(options.stripChars.toString().replace(/^\/(.*)\/$/, '^$1'));
+  // Ensure the regular expressions start with /^
+  var stack = [];
+  var blocks = [options];
+  i = 0;
+
+  while (i < blocks.length) {
+    // Rewrite regexps so that they have ^
+    if (blocks[i].split instanceof RegExp) {
+      if (!blocks[i].split.toString().startsWith('/^')) {
+        blocks[i].split = new RegExp(blocks[i].split.toString().replace(/^\/(.*)\/$/, '^$1'));
+      }
+    }
+
+
+    if (blocks[i].strip) {
+      let s;
+      for (s in blocks[i].strip) {
+        if (blocks[i].strip instanceof RegExp) {
+          if (!blocks[i].strip.toString().startsWith('/^')) {
+            blocks[i].strip = new RegExp(blocks[i].strip.toString().replace(/^\/(.*)\/$/, '^$1'));
+          }
         }
       }
     }
+
+    //if (blocks[i].blocks) {
+      //stack.push
+    //} else {
+      i++
+    //}
   }
+
+  // Dereference
+  skemer.dereference(options);
 
   // Set up initial environment
   // Stores the stack of block
@@ -84,11 +104,14 @@ module.exports = function stringParse(string, options) {
       if (options.debug) iD((options.debug === 1 ? '%%Found an escaped stop in block ' + b + '%%' : '')
           + current.block.escapedStop, '0;34');
       if (current.start !== i) {
-        current.part.push(string.slice(current.start, i));
-      }
-      if (current.block.replaceEscapes) {
-        // Push string before into part along with stop character
-        current.part.push(current.block.stop);
+        if (current.block.replaceEscapes) {
+          // Push string before into part along with start character
+          current.part.push(string.slice(current.start, i));
+          current.part.push(current.block.stop);
+        } else {
+          current.part.push(string.slice(current.start,
+              i + current.block.escapedStop.length));
+        }
         current.start = i + current.block.escapedStop.length;
       }
       i = i + current.block.escapedStop.length;
@@ -166,16 +189,20 @@ module.exports = function stringParse(string, options) {
       for (b in current.block.blocks) {
         // Check for a escaped start
         if (current.block.blocks[b].escapedStart
-            && string.substr(i, current.block.blocks[b].escapedStart.length) === current.block.blocks[b].quote) {
-          if (options.debug) iD((options.debug === 1 ? '%%Found a quote in block ' + b + '%%' : '')
+            && string.substr(i, current.block.blocks[b].escapedStart.length)
+            === current.block.blocks[b].escapedStart) {
+          if (options.debug) iD((options.debug === 1 ? '%%Found a escaped start ' + b + '%%' : '')
           + current.block.blocks[b].escapedStart, '0;34');
           if (current.start !== i) {
-            current.part.push(string.slice(current.start, i));
-          }
-          if (current.block.replaceEscapes) {
-            // Push string before into part along with start character
-            current.part.push(current.block.start);
-            current.start = i + current.block.escapedStart.length;
+            if (current.block.blocks[b].replaceEscapes) {
+              // Push string before into part along with start character
+              current.part.push(string.slice(current.start, i));
+              current.part.push(current.block.blocks[b].start);
+            } else {
+              current.part.push(string.slice(current.start,
+                  i + current.block.blocks[b].escapedStart.length));
+            }
+            current.start = i + current.block.blocks[b].escapedStart.length;
           }
           i = i + current.block.blocks[b].escapedStart.length;
           continue parse;

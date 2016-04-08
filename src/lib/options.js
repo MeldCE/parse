@@ -4,7 +4,9 @@
 module.exports = {
   type: {
     split: {
-      description: 'Characters or regular expression to split string on',
+      description: 'Characters or regular expression to split string on.'
+          + 'Regular expressions must match from the start of the string, '
+          + 'eg /^( |=)/',
       types: {
         string: {
           type: 'string',
@@ -32,7 +34,8 @@ module.exports = {
     },
     strip: {
       description: 'Characters or regular expression expressions to strip '
-          + 'from outside of blocks',
+          + 'from outside of blocks. Regular expressions must match from '
+          + 'the start of the string, eg /^( |=)/',
       types: {
         string: {
           type: 'string',
