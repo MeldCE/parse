@@ -1,9 +1,31 @@
-'use strict';
+"use strict";
 
-let iD = require('./color-debug.js').debug;
 let skemer = require('skemer');
+let colors = require('colors');
 
 let stringParseOptions = require('./options.js');
+
+function longDebug(lDebug, sDebug, color) {
+	if (sDebug === undefined) {
+		sDebug = '';
+	}
+	if (color) {
+		process.stdout.write(color(lDebug + sDebug));
+	} else {
+		process.stdout.write(lDebug + sDebug);
+	}
+}
+
+function shortDebug(lDebug, sDebug, color) {
+	if (sDebug === undefined) {
+		return;
+	}
+	if (color) {
+		process.stdout.write(color(sDebug));
+	} else {
+		process.stdout.write(sDebug);
+	}
+}
 
 /**
  * Parses the given string using the given options
@@ -33,6 +55,12 @@ module.exports = function stringParse(string, options) {
     noDereference: true
   }, options);
 
+	var debug;
+	if (options.debug === 1) {
+		debug = longDebug;
+	} else {
+		debug = shortDebug;
+	}
 
   // Ensure the regular expressions start with /^
   var stack = [];
@@ -106,8 +134,8 @@ module.exports = function stringParse(string, options) {
     if (current.block.escapedStop
         && (string.substr(i, current.block.escapedStop.length)
         === current.block.escapedStop)) {
-      if (options.debug) iD((options.debug === 1 ? '%%Found an escaped stop in block ' + b + '%%' : '')
-          + current.block.escapedStop, '0;34');
+      if (options.debug) debug('%%Found an escaped stop in block ' + b + '%%',
+      		current.block.escapedStop, colors.blue);
       if (current.start !== i) {
         if (current.block.replaceEscapes) {
           // Push string before into part along with start character
@@ -125,8 +153,8 @@ module.exports = function stringParse(string, options) {
     // Check for stop character
     if (current.block.stop
         && string.substr(i, current.block.stop.length) === current.block.stop) {
-      if (options.debug) iD((options.debug === 1 ? '%%Found a stop for block ' + current.name + '%%' : '')
-      + current.block.stop, '1;31');
+      if (options.debug) debug('%%Found a stop for block ' + current.name
+					+ '%%', current.block.stop, colors.red);
       
       if (current.start !== i) {
         current.part.push(string.slice(current.start, i));
@@ -141,7 +169,7 @@ module.exports = function stringParse(string, options) {
       if (current.block.keepStartStop) {
         current.parts.push(current.block.stop);
       }
-      if (options.debug === 1) iD('%%Parts of ' + current.name + ' is ' + current.parts + '%%');
+      if (options.debug === 1) debug('%%Parts of ' + current.name + ' is ' + current.parts + '%%');
       let output = current.parts;
 
       i = i + current.block.stop.length;
@@ -173,7 +201,7 @@ module.exports = function stringParse(string, options) {
 
       // Pop the outer block off the stack
       current = stack.pop();
-      if (options.debug === 1) iD('%%block is now ' + (current.name || 'root') + '%%');
+      if (options.debug === 1) debug('%%block is now ' + (current.name || 'root') + '%%');
       
       current.start = i;
 
@@ -196,8 +224,8 @@ module.exports = function stringParse(string, options) {
         if (current.block.blocks[b].escapedStart
             && string.substr(i, current.block.blocks[b].escapedStart.length)
             === current.block.blocks[b].escapedStart) {
-          if (options.debug) iD((options.debug === 1 ? '%%Found a escaped start ' + b + '%%' : '')
-          + current.block.blocks[b].escapedStart, '0;34');
+          if (options.debug) debug('%%Found a escaped start ' + b + '%%',
+          		current.block.blocks[b].escapedStart, colors.blue);
           if (current.start !== i) {
             if (current.block.blocks[b].replaceEscapes) {
               // Push string before into part along with start character
@@ -216,8 +244,8 @@ module.exports = function stringParse(string, options) {
         // Check if start character for block
         if ((current.block.blocks[b].start.length > 1 ? string.substr(i, current.block.blocks[b].start.length)
             : string[i]) === current.block.blocks[b].start) {
-          if (options.debug) iD((options.debug === 1 ? '%%Found a start for block ' + b + '%%' : '')
-              + current.block.blocks[b].start, '1;32');
+          if (options.debug) debug('%%Found a start for block ' + b + '%%',
+              current.block.blocks[b].start, colors.green);
           // Finish part and push into parts
           if (current.start !== i) {
             current.part.push(string.slice(current.start, i));
@@ -258,8 +286,8 @@ module.exports = function stringParse(string, options) {
       if (typeof current.block.split === 'string') {
         if ((current.block.split.length > 1 ? string.substr(i, current.block.split.length)
             : string[i]) === current.block.split) {
-          if (options.debug) iD((options.debug === 1 ? '%%Found a split character%%' : '')
-              + current.block.split, '1;36');
+          if (options.debug) debug('%%Found a split character%%',
+              current.block.split, colors.cyan);
           // Finish part and push into parts
           if (current.start !== i) {
             current.part.push(string.slice(current.start, i));
@@ -292,7 +320,8 @@ module.exports = function stringParse(string, options) {
       } else if (current.block.split instanceof RegExp) {
         var match;
         if (match = current.block.split.exec(string.slice(i))) {
-          if (options.debug) iD((options.debug === 1 ? '%%Found a split regex%%' : '') + match[0], '1;36');
+          if (options.debug) debug('%%Found a split regex%%', match[0],
+							colors.cyan);
           
           // Finish part and push into parts
           if (current.start !== i) {
@@ -329,8 +358,8 @@ module.exports = function stringParse(string, options) {
         if (typeof current.block.strip[s] === 'string') {
           if ((current.block.strip[s].length > 1 ? string.substr(i, current.block.strip[s].length)
               : string[i]) === current.block.strip[s]) {
-            if (options.debug) iD((options.debug === 1 ? '%%Found a to strip character%%' : '')
-                + current.block.strip[s], '0;35');
+            if (options.debug) debug('%%Found a to strip character%%',
+                current.block.strip[s], colors.magenta);
             
             // Push current string into part
             if (current.start !== i) {
@@ -344,8 +373,8 @@ module.exports = function stringParse(string, options) {
         } else if (current.block.strip[s] instanceof RegExp) {
           var match;
           if (match = current.block.strip[s].exec(string.slice(i))) {
-            if (options.debug) iD((options.debug === 1 ? '%%Found a to strip regex%%' : '')
-                + match[0], '0;35');
+            if (options.debug) debug('%%Found a to strip regex%%',
+                match[0], colors.magenta);
             
             // Push current string into part
             if (current.start !== i) {
@@ -360,7 +389,8 @@ module.exports = function stringParse(string, options) {
       }
     }
 
-    if (options.debug) iD(string[i], (inBlocks.length ? '0;37' : '1;37'));
+    if (options.debug) debug('', string[i],
+				(inBlocks.length ? undefined : colors.white));
     i++;
   }
 
