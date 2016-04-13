@@ -29,6 +29,7 @@
   "homepage": "https://github.com/MeldCE/string-parse#readme",
   "dependencies": {
     "color-console": "0.0.1",
+    "colors": "^1.1.2",
     "skemer": "^0.8.6-r1"
   },
   "devDependencies": {
@@ -49,7 +50,7 @@
     "gulp-replace": "^0.5.4",
     "gulp-strip-debug": "^1.1.0",
     "jasmine": "^2.4.1",
-    "jasmine2-reporter": "^0.1.2"
+    "jasmine2-reporter": "^0.2.0"
   },
   "tonicExampleFilename": "example.js"
 }

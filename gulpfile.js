@@ -119,9 +119,11 @@ gulp.task('pre-test', ['lint', 'lint:test'], function() {
     .pipe(gulp.dest('test-tmp/'));
 });
 
-gulp.task('jasmine', ['compile:tests', 'lint', 'lint:test'], function() {
+gulp.task('jasmine', ['compile:tests', 'lint', 'lint:test', 'pre-test'], function() {
   return gulp.src(paths.srcTests)
       .pipe(jasmine())
+      .pipe(istanbul.writeReports());
+
 });
 
 gulp.task('jasmine:production', ['copy', 'jasmine', 'pre-test'], function() {
@@ -153,7 +155,7 @@ gulp.task('compile', ['lint'], function() {
     stringParseOptions: {
       schema: options,
       options: {
-        preLine: '  * ',
+        preLine: ' * ',
         name: 'options',
         wrap: 80,
         type: 'param'
