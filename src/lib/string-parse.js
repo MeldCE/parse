@@ -177,9 +177,10 @@ module.exports = function stringParse(string, options) {
       if (current.block.handle) {
         // TODO handle replacement parsing
         if (options.context) {
-          output = current.block.handle.call(options.context, current.parts);
+          output = current.block.handle.call(options.context, current.parts,
+              inBlocks);
         } else {
-          output = current.block.handle(current.parts);
+          output = current.block.handle(current.parts, inBlocks);
         }
         
         if (current.block.reparse && typeof output === 'string') {
@@ -208,9 +209,11 @@ module.exports = function stringParse(string, options) {
       if (output) {
         if (!stack.length && current.block.handle && current.block.handleAll) {
           if (options.context) {
-            output = current.block.handle.call(options.context, output);
+            output = current.block.handle.call(options.context, output,
+                inBlocks);
           } else {
-            output = current.block.handle(output);
+            output = current.block.handle(output,
+                inBlocks);
           }
         }
         current.parts.push(output);
@@ -256,9 +259,9 @@ module.exports = function stringParse(string, options) {
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
               if (options.context) {
-                part = current.block.handle.call(options.context, part);
+                part = current.block.handle.call(options.context, part, inBlocks);
               } else {
-                part = current.block.handle(part);
+                part = current.block.handle(part, inBlocks);
               }
             }
             current.parts.push(part);
@@ -297,9 +300,9 @@ module.exports = function stringParse(string, options) {
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
               if (options.context) {
-                part = current.block.handle.call(options.context, part);
+                part = current.block.handle.call(options.context, part, inBlocks);
               } else {
-                part = current.block.handle(part);
+                part = current.block.handle(part, inBlocks);
               }
             }
             current.parts.push(part);
@@ -407,9 +410,9 @@ module.exports = function stringParse(string, options) {
     let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
     if (!stack.length && current.block.handle) {
       if (options.context) {
-        part = current.block.handle.call(options.context, part);
+        part = current.block.handle.call(options.context, part, inBlocks);
       } else {
-        part = current.block.handle(part);
+        part = current.block.handle(part, inBlocks);
       }
     }
     current.parts.push(part);
