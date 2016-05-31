@@ -116,7 +116,7 @@ module.exports = {
     handle: {
       description: 'The function to pass all non-block and non-handled block '
           + 'strings to. The function will be given the string as the first '
-          + 'parameter. The second parameter will be an array containing the 
+          + 'parameter. The second parameter will be an array containing the '
           + 'block types that have been descended into previous to this.',
       type: 'function'
     },

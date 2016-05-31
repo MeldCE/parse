@@ -6,25 +6,25 @@ let colors = require('colors');
 let stringParseOptions = require('./options.js');
 
 function longDebug(lDebug, sDebug, color) {
-	if (sDebug === undefined) {
-		sDebug = '';
-	}
-	if (color) {
-		process.stdout.write(color(lDebug + sDebug));
-	} else {
-		process.stdout.write(lDebug + sDebug);
-	}
+  if (sDebug === undefined) {
+    sDebug = '';
+  }
+  if (color) {
+    process.stdout.write(color(lDebug + sDebug));
+  } else {
+    process.stdout.write(lDebug + sDebug);
+  }
 }
 
 function shortDebug(lDebug, sDebug, color) {
-	if (sDebug === undefined) {
-		return;
-	}
-	if (color) {
-		process.stdout.write(color(sDebug));
-	} else {
-		process.stdout.write(sDebug);
-	}
+  if (sDebug === undefined) {
+    return;
+  }
+  if (color) {
+    process.stdout.write(color(sDebug));
+  } else {
+    process.stdout.write(sDebug);
+  }
 }
 
 /**
@@ -37,14 +37,12 @@ function shortDebug(lDebug, sDebug, color) {
  *          part to the string or and array of parsed string parts
  */
 module.exports = function stringParse(string, options) {
-	if (typeof string !== 'string') {
-		throw new Error('A string must be given to parse (string was a '
-			+ typeof string + ')');
-	}
+  if (typeof string !== 'string') {
+    throw new Error('A string must be given to parse (string was a '
+      + typeof string + ')');
+  }
 
-	var parts = [''], currentPart = 0;
-
-  var inBlocks = [];
+  var parts = [''], currentPart = 0;
 
   var b, last = 0, i = 0;
   
@@ -55,19 +53,20 @@ module.exports = function stringParse(string, options) {
     noDereference: true
   }, options);
 
-	var debug;
-	if (options.debug === 1) {
-		debug = longDebug;
-	} else {
-		debug = shortDebug;
-	}
+  var debug;
+  if (options.debug === 1) {
+    debug = longDebug;
+  } else {
+    debug = shortDebug;
+  }
 
   // Ensure the regular expressions start with /^
   var stack = [];
   var blocks = [options];
   i = 0;
 
-  while (i < blocks.length) {
+  while (i < blocks.length || (stack.length && (blocks = stack.pop())
+      && (i = blocks.i) && (blocks = blocks.blocks))) {
     // Rewrite regexps so that they have ^
     if (blocks[i].split instanceof RegExp) {
       if (!blocks[i].split.toString().startsWith('/^')) {
@@ -87,11 +86,19 @@ module.exports = function stringParse(string, options) {
       }
     }
 
-    //if (blocks[i].blocks) {
-      //stack.push
-    //} else {
-      i++
-    //}
+    if (blocks[i].blocks) {
+      if (i !== blocks.length - 1) {
+        stack.push({
+          i: i + 1,
+          blocks: blocks
+        });
+      }
+      blocks = blocks[i].blocks;
+      i = 0;
+      continue;
+    }
+
+    i++;
   }
 
   // Dereference
@@ -109,7 +116,8 @@ module.exports = function stringParse(string, options) {
     start: 0, // Stores the first character position of the current string
     parts: [], // Stores the strings
     part: [] //Stores the chunks of the current string
-  }
+  };
+  var old;
 
   function resetString() {
     // Finish current string
@@ -135,7 +143,7 @@ module.exports = function stringParse(string, options) {
         && (string.substr(i, current.block.escapedStop.length)
         === current.block.escapedStop)) {
       if (options.debug) debug('%%Found an escaped stop in block ' + b + '%%',
-      		current.block.escapedStop, colors.blue);
+          current.block.escapedStop, colors.blue);
       if (current.start !== i) {
         if (current.block.replaceEscapes) {
           // Push string before into part along with start character
@@ -154,7 +162,7 @@ module.exports = function stringParse(string, options) {
     if (current.block.stop
         && string.substr(i, current.block.stop.length) === current.block.stop) {
       if (options.debug) debug('%%Found a stop for block ' + current.name
-					+ '%%', current.block.stop, colors.red);
+          + '%%', current.block.stop, colors.red);
       
       if (current.start !== i) {
         current.part.push(string.slice(current.start, i));
@@ -174,16 +182,20 @@ module.exports = function stringParse(string, options) {
 
       i = i + current.block.stop.length;
 
-      if (current.block.handle) {
+      // Pop the outer block off the stack
+      old = current;
+      current = stack.pop();
+
+      if (old.block.handle) {
         // TODO handle replacement parsing
         if (options.context) {
-          output = current.block.handle.call(options.context, current.parts,
-              inBlocks);
+          output = old.block.handle.call(options.context, old.parts,
+              stack);
         } else {
-          output = current.block.handle(current.parts, inBlocks);
+          output = old.block.handle(old.parts, stack);
         }
         
-        if (current.block.reparse && typeof output === 'string') {
+        if (old.block.reparse && typeof output === 'string') {
           // Store current string
           stringStack.push({
             string: string,
@@ -200,8 +212,6 @@ module.exports = function stringParse(string, options) {
         }
       }
 
-      // Pop the outer block off the stack
-      current = stack.pop();
       if (options.debug === 1) debug('%%block is now ' + (current.name || 'root') + '%%');
       
       current.start = i;
@@ -210,10 +220,10 @@ module.exports = function stringParse(string, options) {
         if (!stack.length && current.block.handle && current.block.handleAll) {
           if (options.context) {
             output = current.block.handle.call(options.context, output,
-                inBlocks);
+                stack);
           } else {
             output = current.block.handle(output,
-                inBlocks);
+                stack);
           }
         }
         current.parts.push(output);
@@ -228,7 +238,7 @@ module.exports = function stringParse(string, options) {
             && string.substr(i, current.block.blocks[b].escapedStart.length)
             === current.block.blocks[b].escapedStart) {
           if (options.debug) debug('%%Found a escaped start ' + b + '%%',
-          		current.block.blocks[b].escapedStart, colors.blue);
+              current.block.blocks[b].escapedStart, colors.blue);
           if (current.start !== i) {
             if (current.block.blocks[b].replaceEscapes) {
               // Push string before into part along with start character
@@ -259,9 +269,9 @@ module.exports = function stringParse(string, options) {
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
               if (options.context) {
-                part = current.block.handle.call(options.context, part, inBlocks);
+                part = current.block.handle.call(options.context, part, stack);
               } else {
-                part = current.block.handle(part, inBlocks);
+                part = current.block.handle(part, stack);
               }
             }
             current.parts.push(part);
@@ -300,9 +310,9 @@ module.exports = function stringParse(string, options) {
             let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
             if (!stack.length && current.block.handle) {
               if (options.context) {
-                part = current.block.handle.call(options.context, part, inBlocks);
+                part = current.block.handle.call(options.context, part, stack);
               } else {
-                part = current.block.handle(part, inBlocks);
+                part = current.block.handle(part, stack);
               }
             }
             current.parts.push(part);
@@ -324,7 +334,7 @@ module.exports = function stringParse(string, options) {
         var match;
         if (match = current.block.split.exec(string.slice(i))) {
           if (options.debug) debug('%%Found a split regex%%', match[0],
-							colors.cyan);
+              colors.cyan);
           
           // Finish part and push into parts
           if (current.start !== i) {
@@ -393,7 +403,7 @@ module.exports = function stringParse(string, options) {
     }
 
     if (options.debug) debug('', string[i],
-				(inBlocks.length ? undefined : colors.white));
+        (stack.length ? undefined : colors.white));
     i++;
   }
 
@@ -410,9 +420,9 @@ module.exports = function stringParse(string, options) {
     let part = (current.part.length > 1 ? current.part.join('') : current.part[0]);
     if (!stack.length && current.block.handle) {
       if (options.context) {
-        part = current.block.handle.call(options.context, part, inBlocks);
+        part = current.block.handle.call(options.context, part, stack);
       } else {
-        part = current.block.handle(part, inBlocks);
+        part = current.block.handle(part, stack);
       }
     }
     current.parts.push(part);
