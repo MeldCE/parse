@@ -1,7 +1,14 @@
+"use strict";
+
 var stringParse = require('../lib/string-parse');
 
 it('should return a basic string with no options', function() {
   expect(stringParse('this string', {})).toEqual('this string');
+});
+
+it('should throw when not given a string', function() {
+  expect(function() { stringParse(123, {}); })
+      .toThrowError('A string must be given to parse (string was a number)');
 });
 
 describe('string splitting', function() {
@@ -13,7 +20,14 @@ describe('string splitting', function() {
   
   it('should split a string with split option as regex', function() {
     expect(stringParse('this string=string', {
-      split: /^[ =]/,
+      split: /^[ =]/
+    })).toEqual(['this', 'string', 'string']);
+  });
+  
+  it('should split a string with split option as non-absolute regex',
+      function() {
+    expect(stringParse('this string=string', {
+      split: /[ =]/
     })).toEqual(['this', 'string', 'string']);
   });
   
@@ -53,7 +67,8 @@ describe('character stripping', function() {
   it('should strip characters with strip option as array of regexs',
       function() {
     expect(stringParse('hello!', {
-      strip: [/^l/, /^!/]
+      strip: [/l/, /^!/],
+      debug: 1
     })).toEqual('heo');
   });
 });
@@ -72,17 +87,18 @@ describe('blocks', function() {
   });
 
   it('should handle escaped block characters', function() {
-    expect(stringParse('val<<1,val2<val>>2a>,val3', {
+    expect(stringParse('val<<1,val2<val:vala>>2a>,val3', {
       split: ',',
       blocks: {
         block: {
           start: '<',
           escapedStart: '<<',
           stop: '>',
-          escapedStop: '>>'
+          escapedStop: '>>',
+          split: ':'
         }
       }
-    })).toEqual(['val<<1', 'val2', 'val>>2a', 'val3']);
+    })).toEqual(['val<<1', 'val2', ['val', 'vala>>2a'], 'val3']);
   });
 
   it('should handle escaped block characters with block characters if '
@@ -104,7 +120,7 @@ describe('blocks', function() {
 
 describe('handle functions', function() {
   it('should call the handle on non-block parts if no handleAll', function() {
-    expect(stringParse('val1,val2<val2a>,val3', {
+    expect(stringParse('val1,<>val2<val2a>,val3', {
       split: ',',
       blocks: {
         block: {
@@ -113,7 +129,7 @@ describe('handle functions', function() {
         }
       },
       handle: function(block) { return block + '!'; }
-    })).toEqual(['val1!', 'val2!', 'val2a', 'val3!']);
+    })).toEqual(['val1!', [], 'val2!', 'val2a', 'val3!']);
   });
 
   it('should call the handle on all parts with handleAll', function() {
@@ -217,5 +233,44 @@ describe('blocks', function() {
         }
       }
     })).toEqual(['val1', 'val', '2', 'val3']);
+  });
+});
+
+describe('Debugging options', function() {
+  it('should allow simple debugging', function() {
+    expect(stringParse('va\\"l1,"val,\\"2",val3', {
+      split: ',',
+      blocks: {
+        quotes: {
+          start: '"',
+          stop: '"',
+          escapedStart: '\\"',
+          escapedStop: '\\"',
+          replaceEscapes: true,
+          keepStartStop: true,
+          handle: function(block) { return [ block ]; },
+          reparse: true
+        }
+      },
+      debug: true
+    })).toEqual(['va"l1', [ ['"', 'val,"2', '"'] ], 'val3']);
+  });
+
+  it('should allow verbose debugging', function() {
+    expect(stringParse('va\\"l1,"val,\\"2",val3', {
+      split: ',',
+      blocks: {
+        quotes: {
+          start: '"',
+          stop: '"',
+          escapedStart: '\\"',
+          escapedStop: '\\"',
+          keepStartStop: true,
+          handle: function(block) { return [ block ]; },
+          reparse: true
+        }
+      },
+      debug: 1
+    })).toEqual(['va\\"l1', [ ['"', 'val,\\"2', '"'] ], 'val3']);
   });
 });

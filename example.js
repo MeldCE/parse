@@ -1,3 +1,5 @@
+"use strict";
+
 var stringParse = require('string-parse');
 
 var parseOptions = {
@@ -7,7 +9,7 @@ var parseOptions = {
       stop: '>',
       split: ' ',
       ignoreEmpty: true,
-      handle: function(block) { return { stoptag: block}; },
+      handle: function(block) { return { stoptag: block}; }
     },
     startTag: {
       start: '<',
@@ -33,7 +35,7 @@ var parseOptions = {
           }
         }
       },
-      handle: function(block) { return { starttag: block }; },
+      handle: function(block) { return { starttag: block }; }
     },
     expression: {
       start: '{{',

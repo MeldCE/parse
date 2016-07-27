@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Options that can be parsed to stringParse
  */
@@ -9,7 +10,7 @@ module.exports = {
           + 'eg /^( |=)/',
       types: {
         string: {
-          type: 'string',
+          type: 'string'
         },
         regex: {
           type: 'RegExp'
@@ -38,7 +39,7 @@ module.exports = {
           + 'the start of the string, eg /^( |=)/',
       types: {
         string: {
-          type: 'string',
+          type: 'string'
         },
         regex: {
           type: 'RegExp'

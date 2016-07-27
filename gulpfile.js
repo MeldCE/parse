@@ -229,7 +229,7 @@ gulp.task('readme', ['mddocs'], function() {
       .pipe(gulp.dest('./'));
 });
 
-gulp.task('copy', ['compile', 'copy:jasmine.json']);
+gulp.task('copy', ['compile', 'copy:jasmine.json', 'readme', 'mddocs']);
 
 gulp.task('copy:jasmine.json', ['jasmine'], function() {
   return gulp.src(paths.srcJasmineJson, { base: 'src' })
